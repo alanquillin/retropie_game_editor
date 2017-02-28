@@ -1,0 +1,8 @@
+flask
+tornado
+requests
+oslo.config
+oslo.log
+xmltodict
+thegamesdb
+pillow

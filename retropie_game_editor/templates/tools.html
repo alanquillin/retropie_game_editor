@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content_title %}RetroPie Game Editor{% endblock %}
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/lib/bootstrap-number-input.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <select id="toolSelector" class="selectpicker" title="Select Tool">
+                    <option value="tool_1">Tool 1</option>
+                </select>
+                <span id="toolLoading" style="display: none">
+                    <div class="glyphicon glyphicon-refresh spinner"></div> Loading...
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+{% block extra_scripts_end %}
+    <script>
+
+    </script>
+{% endblock %}

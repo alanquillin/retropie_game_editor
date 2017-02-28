@@ -1,0 +1,136 @@
+<div id="gamesDetailsSaveError" class="alert alert-danger" role="alert" style="display: none">
+    Error while trying to save the game details<br/>
+    <span id="gamesDetailsSaveErrorMessage"></span><br/>
+</div>
+<div id="gamesDetailsSaveSuccess" class="alert alert-success" role="alert" style="display: none">
+    Game Details Saved Successfully!<br/>
+</div>
+<form id="gamesDetailsForm" action="/games" method="post" role="form">
+    <input type="hidden" name="system" value="{{ system }}">
+    <input type="hidden" name="game" value="{{ game }}">
+    <div class="row">
+        <div class="col-xs-8">
+            <div class="row">
+                <div class="form-group col-xs-12">
+                  <label for="name">Name</label>
+                  <input type="text" class="form-control" name="name" value="{{game_details.get('name', '')}}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-xs-12">
+                  <label for="path">Path</label>
+                  <input type="text" class="form-control" name="path" value="{{game_details.get('path', '')}}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="developer" class="col-xs-3">Developer</label>
+                    <div class="col-xs-6">
+                        <input type="text" class="form-control" name="developer" value="{{game_details.get('developer', '')}}" style="width: 100px">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="publisher" class="col-xs-3">Publisher</label>
+                    <div class="col-xs-6">
+                        <input type="text" class="form-control" name="publisher" value="{{game_details.get('publisher', '')}}" style="width: 100px">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="genre" class="col-xs-3">Genre</label>
+                    <div class="col-xs-4">
+                        <input type="text" class="form-control" name="genre" value="{{game_details.get('genre', '')}}" style="width: 100px">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="releaseDate" class="col-xs-3">Release Date</label>
+                    <div class="col-xs-4">
+                        <div class="input-group date">
+                            <input type="text" class="form-control" id="gameDetailsReleaseDateInput" name="releaseDate" value="{{game_details.get('releasedate_display', '')}}">
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="players" class="control-label col-xs-3">Players</label>
+                    <div class="col-xs-3">
+                        <input type="text" min="1" max="8" class="form-control" id="gameDetailsPlayersInput" name="players" value="{{game_details.get('players', 1)|int}}">
+                    </div>
+                    <div class="col-xs-7"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div id="gameDetailsImageLoading">
+                <div class="glyphicon glyphicon-refresh spinner"></div> Loading image...
+            </div>
+            <div id="gameDetailsImage"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-xs-12">
+          <label for="description">Description</label>
+          <textarea rows="8" class="form-control" name="description">{{game_details.get('desc', '')}}</textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-xs-12">
+            <button id="gamesDetailsSaveBtn" type="submit" class="btn btn-primary">Save</button>
+            <span id="gameDetailsSaving" style="display: none">
+                <div class="glyphicon glyphicon-refresh spinner"></div> Saving...
+            </span>
+        </div>
+    </div>
+</form>
+
+
+<script>
+  $( document ).ready(function() {
+    $('#gameDetailsPlayersInput').bootstrapNumber();
+    $('#gameDetailsReleaseDateInput').datepicker();
+
+    $('#gamesDetailsSaveBtn').click( function() {
+        $('#gamesDetailsSaveSuccess').hide();
+        $('#gamesDetailsSaveError').hide();
+        $('#gameDetailsSaving').show();
+        $('#gamesDetailsSaveBtn').prop('disabled', 'disabled');
+        $('#gamesDetailsSaveBtn').addClass('disabled');
+
+        var url = '/systems/{{ system }}/games/{{ game }}';
+        $.post(url, $('#gamesDetailsForm').serialize())
+            .success(function(){
+                $('#gamesDetailsSaveSuccess').show();
+            })
+            .fail(function(jqXHR, textStatus, err){
+                $('#gamesDetailsSaveError').show();
+                $('#gamesDetailsSaveErrorMessage').text(err);
+            })
+            .always(function(){
+                $('#gameDetailsSaving').hide();
+                $('#gamesDetailsSaveBtn').prop('disabled', false);
+                $('#gamesDetailsSaveBtn').removeClass('disabled');
+            });
+        return false;
+    });
+
+    var img = $("<img />").attr('src', '/systems/{{ system }}/games/{{ game|e }}/image/thumbnail')
+    .on('load', function() {
+        console.log('Cover image for {{ system }} -> {{ game|e }} loaded.');
+        if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+            alert('broken image!');
+        } else {
+            $("#gameDetailsImage").append(img);
+            $("#gameDetailsImageLoading").hide();
+        }
+    });
+  });
+</script>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}{% endblock %} | RetroPie Game Editor</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+              integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker3.standalone.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/retropie_game_editor.css') }}">
+        {% block extra_styles %}{% endblock %}
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+                crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
+        {% block extra_scripts %}{% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-fixed-top navbar-inverse">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <span class="navbar-brand"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;RetroPie Game Editor</span>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                <li{% if request.path == url_for('dashboard') %} class="active"{% endif %}><a href="{{ url_for('dashboard') }}">Games</a></li>
+                <li{% if request.path == url_for('tools_dashboard') %} class="active"{% endif %}><a href="{{ url_for('tools_dashboard') }}">Tools</a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container">
+          <div class="starter-template">
+            <h1>&nbsp;</h1>
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+            <div class="alert alert-dismissable alert-{{ category }}">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+            </div>
+            {% endfor %}
+            {% block content %}
+            {% endblock %}
+          </div>
+        </div>
+        {% block extra_scripts_end %}{% endblock %}
+    </body>
+</html>

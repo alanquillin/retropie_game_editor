@@ -1,0 +1,8 @@
+<div class="list-group">
+    {% for game, game_details in games_details|dictsort %}
+    {% set game_name = game_details.get('name') %}
+    {% set game_display = game if not game_name else game_name %}
+    {% set text_class = 'text-muted muted' if not game_name else 'text-success' %}
+    <a href="#" onclick="gameSelected('{{system}}', '{{ game|e|replace("'", "&#39;") }}', this)" class="list-group-item list-group-item-action game-list-item {{ text_class }}">{{ game_display|e }}</a>
+    {% endfor %}
+</div>

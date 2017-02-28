@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content_title %}RetroPie Game Editor{% endblock %}
+{% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/lib/bootstrap-number-input.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-4">
+                <select id="systemsListSelector" class="selectpicker" title="Select Game System">
+                  {% for system, data in systems | dictsort %}
+                    {% if data['game_count'] > 0 %}
+                      <option title="{{ data['display_name'] }}" data-content="<span class='badge pull-right'>{{ data['game_count'] }}</span><span>{{ data['display_name'] }}</span>&nbsp;">{{ system }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                <div id="gamesListError" class="alert alert-danger" role="alert" style="display: none">
+                    Error while trying to retrieve game list<br/>
+                    <span id="gamesListErrorMessage"></span><br/>
+                </div>
+                <div id="gamesListLoading" style="display: none">
+                    <div class="glyphicon glyphicon-refresh spinner"></div> Loading...
+                </div>
+                <div id="gamesListContainer" style="display: none"></div>
+            </div>
+            <div class="col-xs-8">
+                <div id="gameDetailsError" class="alert alert-danger" role="alert" style="display: none">
+                    Error while trying to retrieve game details<br/>
+                    <span id="gameDetailsErrorMessage"></span><br/>
+                </div>
+                <div id="gameDetailsLoading" style="display: none">
+                    <div class="glyphicon glyphicon-refresh spinner"></div> Loading...
+                </div>
+                <div id="gameDetailsContainer" style="display: none"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_scripts_end %}
+    <script>
+        $( document ).ready(function() {
+            $('#gamesListError').hide();
+            $('#gamesListLoading').hide();
+            $('#gamesListContainer').hide();
+            $('#gameDetailsLoading').hide();
+            $('#gameDetailsContainer').hide();
+
+            $('#systemsListSelector').on('changed.bs.select', function (e, idx, newVal, oldVal) {
+                systemSelected($('#systemsListSelector').val());
+            });
+        });
+
+        function systemSelected(system){
+            $('#systemsListSelector').prop('disabled', 'disabled');
+            $('#gamesListLoading').show();
+            $('#gamesListContainer').hide();
+            $('#gamesListError').hide();
+
+            var url = "/systems/" + system + "/games";
+            $.get(url, function(data) {
+                $('#gamesListContainer').html(data);
+                $('#gamesListContainer').show();
+            }).fail(function(jqXHR) {
+                if(jqXHR.status>0){
+                    setGamesListErrorMsg(jqXHR.statusText + ' (' + jqXHR.status + ')');
+                }
+                else{
+                    setGamesListErrorMsg('Unable to connect to the service... Connection refused');
+                }
+            }).always(function() {
+                $('#systemsListSelector').prop('disabled', false);
+                $('#gamesListLoading').hide();
+            });
+        }
+
+        function setGamesListErrorMsg(msg){
+            $('#gamesListErrorMessage').text(msg);
+            $('#gamesListError').show();
+        }
+
+        function gameSelected(system, game, obj){
+            game = game.replace("&#39;", "'");
+            $('.game-list-item').removeClass('active');
+            $(obj).addClass('active');
+
+            $('#gameDetailsLoading').show();
+            $('#gameDetailsError').hide();
+
+            var url = "/systems/" + system + "/games/" + game;
+            $.get(url, function(data) {
+                $('#gameDetailsContainer').html(data);
+                $('#gameDetailsContainer').show();
+            }).fail(function(jqXHR) {
+                if(jqXHR.status>0){
+                    setGameDetailsErrorMsg(jqXHR.statusText + ' (' + jqXHR.status + ')');
+                }
+                else{
+                    setGameDetailsErrorMsg('Unable to connect to the service... Connection refused');
+                }
+            }).always(function() {
+                $('#gameDetailsLoading').hide();
+            });
+        }
+
+        function setGameDetailsErrorMsg(msg){
+            $('#gameDetailsErrorMessage').text(msg);
+            $('#gameDetailsError').show();
+        }
+    </script>
+{% endblock %}
